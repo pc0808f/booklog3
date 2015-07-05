@@ -2,9 +2,17 @@ var express = require('express');
 var router = express.Router();
 
 router.get('/1/post', function(req, res, next) {
-  req.app.db.model.Post.find({}, function(err, posts) {
-  	res.json(posts);
-  });
+  if (req.isAuthenticated()) { return next(); }
+  res.redirect('/login/facebook');
+});
+
+router.get('/1/post', function(req, res, next) {
+  req.app.db.model.Post
+    .find({})
+    .populate('userId')
+    .exec(function(err, posts) {
+  	  res.json(posts);
+    });
 });
 
 router.get('/1/post/:id', function(req, res, next) {
@@ -18,12 +26,13 @@ router.post('/1/post', function(req, res, next) {
   
   var instance = new Post({
     title: req.query.title,
-    content: req.query.content
+    content: req.query.content,
+    userId: req.user._id
   });
 
-  instance.save();
-
-  res.json("create a new post");
+  instance.save(function(err, user) {
+    res.json(user);
+  });
 });
 
 router.delete('/1/post/:id', function(req, res, next) {

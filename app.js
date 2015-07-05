@@ -26,15 +26,26 @@ mongoose.connection.on('open', function() {
 var postSchema = new mongoose.Schema({
     title  :  { type: String }
   , content   :  { type: String }
+  , userId: { type: mongoose.Schema.Types.ObjectId, ref: 'user' },
+});
+
+var userSchema = new mongoose.Schema({
+  username: { type: String, unique: true, select: false  },
+  displayName: { type: String, unique: true },
+  email: { type: String, unique: true, select: false  },
+  timeCreated: { type: Date, default: Date.now, select: false },
+  facebook: { type: Object, select: false }
 });
 
 var Post = mongoose.model('post', postSchema);
+var User = mongoose.model('user', userSchema);
 
 var app = express();
 
 app.db = {
   model: {
-    Post: Post
+    Post: Post,
+    User: User
   }
 };
 
@@ -68,7 +79,23 @@ passport.use(new FacebookStrategy({
     callbackURL: "http://localhost:3000/auth/facebook/callback"
   },
   function(accessToken, refreshToken, profile, done) {
-    return done(null, profile);
+    app.db.model.User.findOne({"facebook._json.id": profile._json.id}, function(err, user) {
+         if (!user) {
+           var obj = {
+             username: profile.username,
+             displayName: profile.displayName,
+             email: '',
+             facebook: profile
+            };
+    
+            var doc = new app.db.model.User(obj);
+            doc.save();
+    
+            user = doc;
+         }
+    
+         return done(null, user); // verify callback                                         
+    });
   }
 ));
 
