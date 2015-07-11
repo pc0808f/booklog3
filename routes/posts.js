@@ -1,11 +1,13 @@
 var express = require('express');
 var router = express.Router();
+var events = require('events');
 
-router.get('/1/post', function(req, res, next) {
+function ensureAuthenticate(req, res, next) {
   if (req.isAuthenticated()) { return next(); }
   res.redirect('/login/facebook');
-});
+}
 
+router.get('/1/post', ensureAuthenticate);
 router.get('/1/post', function(req, res, next) {
   req.app.db.model.Post
     .find({})
@@ -15,24 +17,58 @@ router.get('/1/post', function(req, res, next) {
     });
 });
 
+router.get('/1/post/:id', ensureAuthenticate);
 router.get('/1/post/:id', function(req, res, next) {
   req.app.db.model.Post.findById(req.params.id, function(err, posts) {
   	res.json(posts);
   });
 });
 
+router.post('/1/post', ensureAuthenticate);
 router.post('/1/post', function(req, res, next) {
+  var workflow = new events.EventEmitter();  
   var Post = req.app.db.model.Post;
+
+  workflow.outcome = {
+      success: false,
+      errfor: {}
+  };
+
+  workflow.on('validation', function() {
+      if (req.query.title.length === 0) 
+          workflow.outcome.errfor.title = '這是必填欄位';
   
-  var instance = new Post({
-    title: req.query.title,
-    content: req.query.content,
-    userId: req.user._id
+      if (typeof(req.query.content) === 'undefined' || req.query.content.length === 0)
+          workflow.outcome.errfor.content = '這是必填欄位';
+  
+      if (Object.keys(workflow.outcome.errfor).length !== 0) {
+          workflow.outcome.success = false;
+          return workflow.emit('response');
+      }
+  
+      workflow.emit('savePost');
   });
 
-  instance.save(function(err, user) {
-    res.json(user);
+  workflow.on('savePost', function() {
+    var doc = new Post({
+      title: req.query.title,
+      content: req.query.content,
+      userId: req.user._id
+    });
+  
+    doc.save(function(err, post) {
+      workflow.outcome.success = true;
+      workflow.outcome.post = post;
+
+      workflow.emit('response');
+    });
   });
+
+  workflow.on('response', function() {
+      res.send(workflow.outcome);
+  });
+  
+  workflow.emit('validation');
 });
 
 router.delete('/1/post/:id', function(req, res, next) {

@@ -122,6 +122,13 @@ app.use(function(req, res, next) {
 });
 
 // error handlers
+app.use(function(err, req, res, next) {
+  if (err === 'data is empty') {
+    res.status(500).send('data is empty');
+  } else {
+    next(err);
+  }
+});
 
 // development error handler
 // will print stacktrace
