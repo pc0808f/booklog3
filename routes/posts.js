@@ -9,12 +9,34 @@ function ensureAuthenticate(req, res, next) {
 
 router.get('/1/post', ensureAuthenticate);
 router.get('/1/post', function(req, res, next) {
-  req.app.db.model.Post
-    .find({})
-    .populate('userId')
-    .exec(function(err, posts) {
-  	  res.json(posts);
-    });
+  var workflow = new events.EventEmitter();  
+  var Post = req.app.db.model.Post;
+
+  workflow.outcome = {
+      success: false,
+      errfor: {}
+  };
+
+  workflow.on('validation', function() {
+    workflow.emit('readPost');
+  });
+
+  workflow.on('readPost', function() {
+    Post
+      .find({})
+      .populate('userId')
+      .exec(function(err, posts) {
+        workflow.outcome.success = true;
+        workflow.outcome.posts = posts;
+        workflow.emit('response');
+      });
+  });
+
+  workflow.on('response', function() {
+      res.send(workflow.outcome);
+  });
+  
+  workflow.emit('validation');
 });
 
 router.get('/1/post/:id', ensureAuthenticate);
@@ -35,18 +57,19 @@ router.post('/1/post', function(req, res, next) {
   };
 
   workflow.on('validation', function() {
-      if (req.query.title.length === 0) 
-          workflow.outcome.errfor.title = '這是必填欄位';
+    if (req.query.title.length === 0) 
+        workflow.outcome.errfor.title = '這是必填欄位';
   
-      if (typeof(req.query.content) === 'undefined' || req.query.content.length === 0)
-          workflow.outcome.errfor.content = '這是必填欄位';
+    if (typeof(req.query.content) === 'undefined' 
+        || req.query.content.length === 0)
+        workflow.outcome.errfor.content = '這是必填欄位';
   
-      if (Object.keys(workflow.outcome.errfor).length !== 0) {
-          workflow.outcome.success = false;
-          return workflow.emit('response');
-      }
+    if (Object.keys(workflow.outcome.errfor).length !== 0) {
+        workflow.outcome.success = false;
+        return workflow.emit('response');
+    }
   
-      workflow.emit('savePost');
+    workflow.emit('savePost');
   });
 
   workflow.on('savePost', function() {
