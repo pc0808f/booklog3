@@ -17,7 +17,7 @@
 </head>
 
 <body>
-<script id='postTemplate' type='text/template'>
+<script id='post-list' type='text/template'>
     <% _.each(posts, function(post) { %>
     <div class="col-md-4 portfolio-item">
         <a href="portfolio-item.html">
@@ -27,6 +27,13 @@
 	        <button id="subject" data-id="<%= post._id %>" class="btn btn-success">Read More</button>
     </div>
     <% }); %>
+</script>
+
+<script id='post-single' type='text/template'>
+    <div class="col-md-12 portfolio-item">
+            <h2 class="media-heading"><%= title %></h2>
+            <h4><%= content %></h4>
+    </div>
 </script>
 
     <nav class="navbar navbar-fixed-top navbar-inverse" role="navigation">
@@ -77,7 +84,7 @@
 
         <div class="container">
         	<div class="row clearfix">
-        		<div class="col-md-8 column">
+        		<div id="form" class="col-md-8 column">
         			<form method="POST" role="form" action="http://localhost:3000/1/post">
         				<div class="form-group">
         					 <label for="exampleInputEmail1">標題</label><input type="text" class="form-control" id="subject" name="subject" />
@@ -85,7 +92,7 @@
                         <div class="form-group">
                              <label for="exampleInputEmail1">內文</label><textarea class="form-control" id="content" name="content" rows="10" placeholder="輸入文章" /></textarea>
                         </div>
-        				<button type="submit" class="btn btn-default">儲存</button>
+        				<button type="submit" id="save-post" class="btn btn-default">儲存</button>
         			</form>
         		</div>
         		<div class="col-md-4 column">

@@ -24,9 +24,10 @@ mongoose.connection.on('open', function() {
 });
 
 var postSchema = new mongoose.Schema({
-    title  :  { type: String }
-  , content   :  { type: String }
-  , userId: { type: mongoose.Schema.Types.ObjectId, ref: 'user' },
+  title  :  { type: String },
+  content   :  { type: String },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'user' },
+  timeCreated: { type: Date, default: Date.now }
 });
 
 var userSchema = new mongoose.Schema({

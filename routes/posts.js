@@ -57,11 +57,11 @@ router.post('/1/post', function(req, res, next) {
   };
 
   workflow.on('validation', function() {
-    if (req.query.title.length === 0) 
+    if (req.body.title.length === 0) 
         workflow.outcome.errfor.title = '這是必填欄位';
   
-    if (typeof(req.query.content) === 'undefined' 
-        || req.query.content.length === 0)
+    if (typeof(req.body.content) === 'undefined' 
+        || req.body.content.length === 0)
         workflow.outcome.errfor.content = '這是必填欄位';
   
     if (Object.keys(workflow.outcome.errfor).length !== 0) {
@@ -74,8 +74,8 @@ router.post('/1/post', function(req, res, next) {
 
   workflow.on('savePost', function() {
     var doc = new Post({
-      title: req.query.title,
-      content: req.query.content,
+      title: req.body.title,
+      content: req.body.content,
       userId: req.user._id
     });
   
