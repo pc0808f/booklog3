@@ -3,7 +3,9 @@ var router = express.Router();
 var events = require('events');
 
 function ensureAuthenticate(req, res, next) {
-  if (req.isAuthenticated()) { return next(); }
+  if (req.isAuthenticated()) {
+  req.app.db.model.Winston.log('info', req.user.displayname);
+  return next(); }
   res.redirect('/login/facebook');
 }
 
