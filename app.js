@@ -19,16 +19,17 @@ var account = require('./routes/account');
 var app = express();
 
 // setup logger for express
-winston.add(winston.transports.File, { 
-  name: 'booklog3',
-  filename: 'booklog-info.log',
-  level: 'info'
-});
 
 winston.add(winston.transports.File, { 
   name: 'booklog3-error',
   filename: 'booklog3-error.log',
   level: 'error'
+});
+
+winston.add(winston.transports.File, { 
+  name: 'booklog3',
+  filename: 'booklog-info.log',
+  level: 'info'
 });
 
 mongoose.connect('mongodb://booklog3:123456@ds053130.mongolab.com:53130/booklog3');
