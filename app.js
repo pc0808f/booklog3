@@ -25,9 +25,15 @@ winston.add(winston.transports.File, {
   level: 'info'
 });
 
+winston.add(winston.transports.File, { 
+  name: 'booklog3-error',
+  filename: 'booklog3-error.log',
+  level: 'error'
+});
+
 mongoose.connect('mongodb://booklog3:123456@ds053130.mongolab.com:53130/booklog3');
 mongoose.connection.on('error', function() {
-  winston.log('info', 'MongoDB: error');
+  winston.log('error', 'MongoDB: error');
 });
 mongoose.connection.on('open', function() {
   winston.log('info', 'MongoDB: connected');
