@@ -61,7 +61,7 @@ var User = mongoose.model('user', userSchema);
 app.db = {
   model: {
     Post: Post,
-    User: User
+    User: User,
   }
 };
 
