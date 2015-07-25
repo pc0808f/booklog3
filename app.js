@@ -21,7 +21,7 @@ var app = express();
 // setup logger for express
 winston.add(winston.transports.File, { 
   name: 'booklog3',
-  filename: 'booklog3-info.log',
+  filename: 'booklog-info.log',
   level: 'info'
 });
 
