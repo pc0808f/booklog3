@@ -4,6 +4,7 @@ var events = require('events');
 
 function ensureAuthenticate(req, res, next) {
   if (req.isAuthenticated()) { return next(); }
+  req.app.db.model.Winston.log('info', "jollen");
   res.redirect('/login/facebook');
 }
 
