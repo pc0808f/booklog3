@@ -1,10 +1,18 @@
 var express = require('express');
 var router = express.Router();
 var events = require('events');
+var winston = require('winston');
+
+winston.add(winston.transports.File, { 
+  name: 'booklog3-1',
+  filename: 'booklog-Auth-info.log',
+  level: 'info'
+});
+
 
 function ensureAuthenticate(req, res, next) {
   if (req.isAuthenticated()) {
-  req.app.db.model.Winston.log('info', req.user.displayname);
+  Winston.log('info', req.user.displayname);
   return next(); }
   res.redirect('/login/facebook');
 }

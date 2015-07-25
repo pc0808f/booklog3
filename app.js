@@ -55,7 +55,6 @@ app.db = {
   model: {
     Post: Post,
     User: User,
-    Winston : winston
   }
 };
 
