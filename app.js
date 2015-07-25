@@ -8,6 +8,8 @@ var mongoose = require('mongoose');
 var session = require('express-session');
 var winston = require('winston');
 var cors = require('cors');
+var numCPUs = require('os').cpus().length;
+var cluster = require('cluster');
 
 var passport = require('passport')
   , FacebookStrategy = require('passport-facebook').Strategy;
@@ -32,6 +34,8 @@ winston.add(winston.transports.File, {
   filename: 'booklog-info.log',
   level: 'info'
 });
+
+winston.log('info', 'Server runs in ' + numCPUs + ' CPU(s)');
 
 mongoose.connect('mongodb://booklog3:123456@ds053130.mongolab.com:53130/booklog3');
 mongoose.connection.on('error', function() {
