@@ -6,6 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var session = require('express-session');
+var winston = require('winston');
 
 var passport = require('passport')
   , FacebookStrategy = require('passport-facebook').Strategy;
@@ -15,12 +16,21 @@ var users = require('./routes/users');
 var posts = require('./routes/posts');
 var account = require('./routes/account');
 
+var app = express();
+
+// setup logger for express
+winston.add(winston.transports.File, { 
+  name: 'booklog3',
+  filename: 'booklog3-info.log',
+  level: 'info'
+});
+
 mongoose.connect('mongodb://booklog3:123456@ds053130.mongolab.com:53130/booklog3');
 mongoose.connection.on('error', function() {
-  console.log('MongoDB: error');
+  winston.log('info', 'MongoDB: error');
 });
 mongoose.connection.on('open', function() {
-  console.log('MongoDB: connected');
+  winston.log('info', 'MongoDB: connected');
 });
 
 var postSchema = new mongoose.Schema({
@@ -40,8 +50,6 @@ var userSchema = new mongoose.Schema({
 
 var Post = mongoose.model('post', postSchema);
 var User = mongoose.model('user', userSchema);
-
-var app = express();
 
 app.db = {
   model: {
