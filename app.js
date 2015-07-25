@@ -19,6 +19,13 @@ var account = require('./routes/account');
 var app = express();
 
 // setup logger for express
+
+winston.add(winston.transports.File, { 
+  name: 'booklog3-error',
+  filename: 'booklog3-error.log',
+  level: 'error'
+});
+
 winston.add(winston.transports.File, { 
   name: 'booklog3',
   filename: 'booklog-info.log',
@@ -27,7 +34,7 @@ winston.add(winston.transports.File, {
 
 mongoose.connect('mongodb://booklog3:123456@ds053130.mongolab.com:53130/booklog3');
 mongoose.connection.on('error', function() {
-  winston.log('info', 'MongoDB: error');
+  winston.log('error', 'MongoDB: error');
 });
 mongoose.connection.on('open', function() {
   winston.log('info', 'MongoDB: connected');
