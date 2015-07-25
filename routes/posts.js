@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var events = require('events');
 var winston = require('winston');
+var cors = require('cors');
 
 winston.add(winston.transports.File, { 
   name: 'booklog3-1',
@@ -17,8 +18,8 @@ function ensureAuthenticate(req, res, next) {
   res.redirect('/login/facebook');
 }
 
-router.get('/1/post', ensureAuthenticate);
-router.get('/1/post', function(req, res, next) {
+router.get('/1/post', cors(), ensureAuthenticate);
+router.get('/1/post', cors(), function(req, res, next) {
   var workflow = new events.EventEmitter();  
   var Post = req.app.db.model.Post;
 
@@ -49,15 +50,15 @@ router.get('/1/post', function(req, res, next) {
   workflow.emit('validation');
 });
 
-router.get('/1/post/:id', ensureAuthenticate);
-router.get('/1/post/:id', function(req, res, next) {
+router.get('/1/post/:id', cors(), ensureAuthenticate);
+router.get('/1/post/:id', cors(), function(req, res, next) {
   req.app.db.model.Post.findById(req.params.id, function(err, posts) {
   	res.json(posts);
   });
 });
 
-router.post('/1/post', ensureAuthenticate);
-router.post('/1/post', function(req, res, next) {
+router.post('/1/post', cors(), ensureAuthenticate);
+router.post('/1/post', cors(), function(req, res, next) {
   var workflow = new events.EventEmitter();  
   var Post = req.app.db.model.Post;
 
@@ -104,13 +105,13 @@ router.post('/1/post', function(req, res, next) {
   workflow.emit('validation');
 });
 
-router.delete('/1/post/:id', function(req, res, next) {
+router.delete('/1/post/:id', cors(), function(req, res, next) {
   req.app.db.model.Post.findByIdAndRemove(req.params.id, function(err, posts) {
   	res.json(posts);
   });
 });
 
-router.put('/1/post/:id', function(req, res, next) {
+router.put('/1/post/:id', cors(), function(req, res, next) {
   var fieldsToSet = {
   	title: req.query.title,
   	content: req.query.content
