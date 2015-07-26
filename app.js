@@ -20,7 +20,6 @@ var account = require('./routes/account');
 var app = express();
 
 // setup logger for express
-
 winston.add(winston.transports.File, { 
   name: 'booklog3-error',
   filename: 'booklog3-error.log',
@@ -77,9 +76,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(session({ secret: 'booklog store' }));
-
-app.use(cors());
+app.use(session({ secret: 'booklog store' }));  
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -95,7 +92,7 @@ passport.deserializeUser(function(obj, done) {
 passport.use(new FacebookStrategy({
     clientID: '1559480364270197',
     clientSecret: '4d5d1e9389c179142348cbb7044bdab1',
-    callbackURL: "http://localhost:3000/auth/facebook/callback"
+    callbackURL: "/auth/facebook/callback"
   },
   function(accessToken, refreshToken, profile, done) {
     app.db.model.User.findOne({"facebook._json.id": profile._json.id}, function(err, user) {
@@ -112,25 +109,29 @@ passport.use(new FacebookStrategy({
     
             user = doc;
          }
+         console.log(user);
     
          return done(null, user); // verify callback                                         
     });
   }
-));
+)); 
+
+// cors
+app.use(cors());  
 
 app.use('/', routes);
 app.use('/', posts);
 app.use('/users', users);
 app.use('/account', account);
 
-app.get('/login/facebook', cors(), 
+app.get('/login/facebook', 
   passport.authenticate('facebook'));
 
-app.get('/auth/facebook/callback', cors(), 
+app.get('/auth/facebook/callback', 
   passport.authenticate('facebook', { failureRedirect: '/login/fail' }),
   function(req, res) {
     // Successful authentication, redirect home.
-    res.redirect('/account/profile');
+    res.redirect('http://jollen.github.io/booklog/');
   });
 
 // catch 404 and forward to error handler
