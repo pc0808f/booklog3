@@ -116,8 +116,14 @@ passport.use(new FacebookStrategy({
   }
 )); 
 
+
+var corsOptions = {
+  origin: 'http://example.com'
+};
+
+
 // cors
-app.use(cors());  
+app.use(cors(corsOptions));  
 
 app.use('/', routes);
 app.use('/', posts);
