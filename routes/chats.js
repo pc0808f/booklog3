@@ -10,15 +10,6 @@ winston.add(winston.transports.File, {
   level: 'info'
 });
 
-
-
-/* GET home page. */
-router.get('/hello', cors(), function(req, res, next) {
-  res.render('index', { title: 'Jollen' });
-});
-
-
-
 /*
  * GET chat messages
  */
@@ -38,7 +29,6 @@ router.get('/start', function(req, res, next) {
     });
 
     workflow.on('response', function() {
-        console.log('get /start');
         workflow.outcome.data = history;
         workflow.outcome.success = true;
         res.send(workflow.outcome);
@@ -85,7 +75,6 @@ router.post('/send/:message', function(req, res, next) {
     });
    
     workflow.on('response', function() {
-        console.log('post /send');
         res.send(workflow.outcome);
     });
 
