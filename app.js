@@ -9,10 +9,13 @@ var session = require('express-session');
 var winston = require('winston');
 var cors = require('cors');
 
+var chat = require('./routes/chats');
+
 var passport = require('passport')
   , FacebookStrategy = require('passport-facebook').Strategy;
 
 var routes = require('./routes/index');
+var chats = require('./routes/chats');
 var users = require('./routes/users');
 var posts = require('./routes/posts');
 var account = require('./routes/account');
@@ -121,8 +124,10 @@ app.use(cors());
 
 app.use('/', routes);
 app.use('/', posts);
+app.use('/', chats);
 app.use('/users', users);
 app.use('/account', account);
+
 
 app.get('/login/facebook', 
   passport.authenticate('facebook'));
