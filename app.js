@@ -8,14 +8,14 @@ var mongoose = require('mongoose');
 var session = require('express-session');
 var winston = require('winston');
 var cors = require('cors');
-var http = require('http');
-var chat = require('./routes/chat');
-var WebSocketServer = require('websocket').server;
+
+var chat = require('./routes/chats');
 
 var passport = require('passport')
   , FacebookStrategy = require('passport-facebook').Strategy;
 
 var routes = require('./routes/index');
+var chats = require('./routes/chats');
 var users = require('./routes/users');
 var posts = require('./routes/posts');
 var account = require('./routes/account');
@@ -122,54 +122,12 @@ passport.use(new FacebookStrategy({
 // cors
 app.use(cors());  
 
-
-
-
-var server = http.createServer(app).listen(app.get('port'), function(){
-  console.log('Express server listening on port ' + app.get('port'));
-});
-
-/*
- *  WebSocket Section
- */
-var wsServer = new WebSocketServer({
-  httpServer: server,
-  autoAcceptConnections: false
-}); 
-
-// create WebSocket connections array
-app.clients = [];
-
-function onWsConnMessage(message) {
-  if (message.type == 'utf8') {
-    console.log('Received message: ' + message.utf8Data);
-  } else if (message.type == 'binary') {
-    console.log('Received binary data.');
-  }
-}
-
-function onWsConnClose(reasonCode, description) {
-  console.log(' Peer disconnected with reason: ' + reasonCode);
-}
-
-function onWsRequest(request) {
-  var connection = request.accept('echo-protocol', request.origin);
-  console.log("WebSocket connection accepted.");
-    
-  app.clients.push(connection);
-
-  connection.on('message', onWsConnMessage);
-  connection.on('close', onWsConnClose);
-}
-
-wsServer.on('request', onWsRequest); 
-
-app.get('/start', chat.start);
-app.post('/send/:message', chat.send);
 app.use('/', routes);
 app.use('/', posts);
+app.use('/', chats);
 app.use('/users', users);
 app.use('/account', account);
+
 
 app.get('/login/facebook', 
   passport.authenticate('facebook'));
